@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Invitation | 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@300;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --blush-pink: #ffefef;
+            --rose: #ff4d6d;
+            --text-dark: #4a4a4a;
+            --glass: rgba(255, 255, 255, 0.75);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #fff5f6 0%, #ffd1d7 100%);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            color: var(--text-dark);
+        }
+
+        /* Floating background elements */
+        #bg-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .floating {
+            position: absolute;
+            animation: floatUp 8s ease-in infinite;
+            opacity: 0;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) scale(0.5); opacity: 0; }
+            20% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+
+        /* Modern Glassmorphic Card */
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 3.5rem 2rem;
+            border-radius: 40px;
+            box-shadow: 0 20px 45px rgba(255, 77, 109, 0.15);
+            text-align: center;
+            max-width: 440px;
+            width: 90%;
+            z-index: 10;
+            animation: cardEntrance 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.8rem;
+            color: var(--rose);
+            margin-bottom: 1.2rem;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+        }
+
+        /* Buttons Group */
+        .btn-group {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 16px 36px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1.05rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-yes {
+            background: var(--rose);
+            color: white;
+            box-shadow: 0 8px 20px rgba(255, 77, 109, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-yes:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px rgba(255, 77, 109, 0.4);
+            background: #ff3355;
+        }
+
+        .btn-no {
+            background: white;
+            color: #8e8e8e;
+            border: 1px solid #eee;
+        }
+
+        .btn-no:hover {
+            background: #fafafa;
+            color: #555;
+            border-color: #ddd;
+        }
+
+        /* Success/Respect Screens */
+        .hidden { display: none !important; }
+        
+        .fade-in {
+            animation: simpleFade 0.8s ease forwards;
+        }
+
+        @keyframes simpleFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .icon-header {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="bg-elements"></div>
+
+    <div class="card" id="mainCard">
+        <div id="question-step">
+            <span class="icon-header">💌</span>
+            <h1>Something special...</h1>
+            <p>I really value who you are and the time we spend together. Because today is for sharing how we feel, I wanted to ask...</p>
+            <h2 style="font-size: 1.6rem; margin-bottom: 2rem; color: #333;">Will you be my Valentine?</h2>
+            
+            <div class="btn-group">
+                <button class="btn btn-yes" onclick="handleChoice('Yes')">Yes 💖</button>
+                <button class="btn btn-no" onclick="handleChoice('No')">No 💬</button>
+            </div>
+        </div>
+
+        <div id="result-step" class="hidden">
+            <span id="result-icon" class="icon-header"></span>
+            <h1 id="result-title"></h1>
+            <p id="result-text"></p>
+        </div>
+    </div>
+
+    <script>
+        // 1. Particle Background Logic (Hearts & Sparkles)
+        const bg = document.getElementById('bg-elements');
+        function createParticle() {
+            const p = document.createElement('div');
+            const isHeart = Math.random() > 0.4;
+            p.className = 'floating';
+            p.innerHTML = isHeart ? '🌸' : '✨';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.fontSize = (Math.random() * 15 + 10) + 'px';
+            p.style.animationDuration = (Math.random() * 4 + 6) + 's';
+            p.style.animationDelay = (Math.random() * 2) + 's';
+            bg.appendChild(p);
+            
+            setTimeout(() => p.remove(), 8000);
+        }
+        setInterval(createParticle, 500);
+
+        // 2. Button Logic
+        async function handleChoice(choice) {
+            const questionStep = document.getElementById('question-step');
+            const resultStep = document.getElementById('result-step');
+            const icon = document.getElementById('result-icon');
+            const title = document.getElementById('result-title');
+            const text = document.getElementById('result-text');
+
+            // Silent Submission to Formspree
+            fetch('https://formspree.io/f/mgolegjw', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    response: choice,
+                    message: choice === 'Yes' ? "She said yes ❤️" : "She said no 💙",
+                    timestamp: new Date().toLocaleString()
+                })
+            });
+
+            // Transition UI
+            questionStep.classList.add('hidden');
+            resultStep.classList.remove('hidden');
+            resultStep.classList.add('fade-in');
+
+            if (choice === 'Yes') {
+                icon.innerText = '🥰';
+                title.innerText = 'Yay! ❤️';
+                text.innerText = 'This made me really happy! I can’t wait to celebrate the day with you. You make everything feel special.';
+                
+                // Premium Confetti Burst
+                const count = 200;
+                const defaults = { origin: { y: 0.7 }, colors: ['#ff4d6d', '#ffb7b2', '#ffffff'] };
+                confetti({ ...defaults, particleCount: 40, spread: 26, startVelocity: 55 });
+                confetti({ ...defaults, particleCount: 30, spread: 60 });
+                confetti({ ...defaults, particleCount: 70, spread: 100, decay: 0.91, scalar: 0.8 });
+            } else {
+                icon.innerText = '💙';
+                title.innerText = 'Thank you';
+                text.innerText = 'Thank you for telling me honestly. I really respect your feelings, and our connection means a lot to me no matter what.';
+            }
+        }
+    </script>
+</body>
+</html>
